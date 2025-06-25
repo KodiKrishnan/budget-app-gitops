@@ -1,0 +1,21 @@
+# ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp-ingress
+  namespace: budget-app
+  annotations:
+    # For nginx ingress controller; adjust if you use another ingress
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: budget-app.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rails-web
+                port:
+                  number: 80

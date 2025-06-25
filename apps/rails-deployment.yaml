@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rails
+  namespace: budget-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rails
+  template:
+    metadata:
+      labels:
+        app: rails
+    spec:
+      containers:
+        - name: rails
+          image: kodiarasan23/budget-app:v1.0.0
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: rails-config
+            - secretRef:
+                name: rails-secret
+          command: ["bundle", "exec", "puma", "-C", "config/puma.rb"]

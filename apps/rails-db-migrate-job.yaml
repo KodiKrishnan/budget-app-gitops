@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rails-db-migrate
+  namespace: budget-app
+spec:
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: kodiarasan23/budget-app:v1.0.0
+          command: ["bundle", "exec", "rails", "db:migrate"]
+          envFrom:
+            - secretRef:
+                name: rails-secret
+            - configMapRef:
+                name: rails-config
+      restartPolicy: OnFailure
