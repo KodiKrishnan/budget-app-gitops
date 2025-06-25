@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    argocd.argoproj.io/tracking-id: budget-app:networking.k8s.io/Ingress:budget-app/myapp-ingress
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: myapp-ingress
+  namespace: budget-app
+spec:
+  rules:
+    - host: budget-app.local
+      http:
+        paths:
+          - backend:
+              service:
+                name: rails-web
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
