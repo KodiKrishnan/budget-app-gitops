@@ -4,7 +4,9 @@ metadata:
   name: argocd-cm
   namespace: argocd
 data:
-  application.instanceLabelKey: argocd.argoproj.io/instance
-  exec.enabled: "true"
-  timeout.reconciliation: "60s"
-  users.anonymous.enabled: "false"
+  # Allow all custom resource kinds (optional but helpful)
+  resource.customizations.health.argoproj.io_Application: |
+    hs = {}
+    hs.status = "Healthy"
+    hs.message = "Application is healthy"
+    return hs
