@@ -1,5 +1,5 @@
 
-# 🚀 DevOps Coding Assessment – Budget Rails App
+# 🚀 Comprehensive DevOps Task: Containerized Rails App Deployment
 
 This repository contains the Docker, Kubernetes, ArgoCD, and Tekton configurations required to deploy a **Ruby on Rails application with PostgreSQL** using GitOps and CI/CD principles.
 
@@ -117,7 +117,7 @@ Refer to the `/screenshots/` folder for:
 
 ---
 
-## 🙋‍♂️ Candidate Info
+## 🙋‍♂️ Author Info
 
 - **Name**: Kodi Krishnan  
 - **Docker Hub**: [kodiarasan23](https://hub.docker.com/u/kodiarasan23)  
