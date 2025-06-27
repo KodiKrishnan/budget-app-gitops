@@ -1,0 +1,56 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: budget-app-build-pipeline
+spec:
+  workspaces:
+    - name: shared-workspace
+      description: A shared workspace for source code to be passed between tasks.
+  params:
+    - name: git-repo-url
+      type: string
+      description: The URL of the Git repository for the Budget App.
+      default: https://github.com/KodiKrishnan/Budget-App-rails-ruby.git
+    - name: git-revision
+      type: string
+      description: The Git revision (branch, tag, or commit SHA) to checkout.
+      default: main
+    - name: image-url
+      type: string
+      description: The target Docker image URL including tag (e.g., docker.io/kodiarasan23/budget-app:latest).
+      default: docker.io/kodiarasan23/budget-app:latest # Default to the user's specified Docker Hub image
+    - name: dockerfile-path
+      type: string
+      description: Path to the Dockerfile within the cloned repository.
+      default: Dockerfile # Assumed to be in the root of the cloned repo
+    - name: context-path
+      type: string
+      description: Build context path within the cloned repository.
+      default: . # Assumed to be the root of the cloned repo
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: git-clone-repo # Reference to the git-clone-repo Task
+      workspaces:
+        - name: output
+          workspace: shared-workspace # Map task's 'output' workspace to pipeline's 'shared-workspace'
+      params:
+        - name: url
+          value: $(params.git-repo-url)
+        - name: revision
+          value: $(params.git-revision)
+    - name: build-push-image
+      taskRef:
+        name: build-and-push-image # Reference to the build-and-push-image Task
+      runAfter:
+        - fetch-source # This task runs only after 'fetch-source' completes successfully
+      workspaces:
+        - name: source
+          workspace: shared-workspace # Map task's 'source' workspace to pipeline's 'shared-workspace'
+      params:
+        - name: image-url
+          value: $(params.image-url)
+        - name: dockerfile-path
+          value: $(params.dockerfile-path)
+        - name: context-path
+          value: $(params.context-path)

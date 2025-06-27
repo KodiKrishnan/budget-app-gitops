@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: docker-debug-pod-explicit-test
+  namespace: default # Ensure this matches your secret and pipeline namespace
+spec:
+  serviceAccountName: tekton-pipeline-sa # Use the same ServiceAccount as your pipeline
+  containers:
+  - name: debug-container
+    image: alpine/git:latest # A lightweight image with 'sh' and basic tools
+    command: ["/bin/sh", "-c", "sleep 3600"] # Keep the pod running for an hour
+    env:
+      - name: DOCKER_CONFIG
+        value: /tekton/home/.docker/ # Simulate Kaniko's environment variable
+    volumeMounts:
+    - name: docker-config-volume
+      mountPath: /tekton/home/.docker/ # Mount the secret to the expected path
+      readOnly: true # Good practice for sensitive data
+  volumes:
+  - name: docker-config-volume
+    secret:
+      secretName: docker-hub-secret # Reference your Docker Hub secret
+      items: # <--- THIS IS THE NEW EXPLICIT MAPPING
+      - key: .dockerconfigjson
+        path: config.json # Mount the content of '.dockerconfigjson' key into 'config.json' file
+  restartPolicy: Never

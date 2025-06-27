@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: budget-app-pipeline-run-
+spec:
+  pipelineRef:
+    name: budget-app-build-pipeline
+  serviceAccountName: tekton-pipeline-sa
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+  params:
+    - name: git-repo-url
+      value: https://github.com/KodiKrishnan/Budget-App-rails-ruby.git
+    - name: git-revision
+      value: main
+    - name: image-url
+      value: docker.io/kodiarasan23/budget-app:v1.0.1
+    - name: dockerfile-path
+      value: Dockerfile
+    - name: context-path
+      value: .

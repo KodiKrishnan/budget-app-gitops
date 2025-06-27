@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-and-push-image
+spec:
+  workspaces:
+    - name: source
+      description: The workspace containing the source code and Dockerfile.
+  params:
+    - name: image-url
+      type: string
+      description: The full URL of the image to build and push (e.g., docker.io/kodiarasan23/budget-app:latest).
+    - name: dockerfile-path
+      type: string
+      description: The path to the Dockerfile relative to the source context.
+      default: Dockerfile
+    - name: context-path
+      type: string
+      description: The build context path relative to the source workspace.
+      default: .
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest
+      env:
+        - name: DOCKER_CONFIG
+          value: /tekton/home/.docker/
+      args:
+        - --dockerfile=$(workspaces.source.path)/$(params.dockerfile-path)
+        - --context=$(workspaces.source.path)/$(params.context-path)
+        - --destination=$(params.image-url)
+      volumeMounts: # Explicitly define volumeMounts for this step
+        - name: docker-config-volume # This name must match a volume in the pod spec
+          mountPath: /tekton/home/.docker/
+          readOnly: true
+  volumes: # <--- THIS IS THE NEW EXPLICIT VOLUME DEFINITION FOR THE TASK
+    - name: docker-config-volume
+      secret:
+        secretName: docker-hub-secret
+        items:
+        - key: .dockerconfigjson
+          path: config.json
